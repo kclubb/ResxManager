@@ -13,9 +13,5 @@ namespace ParseData
         public string Comment { get; set; }
         public string TranslateComment { get; set; }
         public int Version { get; set; }
-        public string ToString()
-        {
-            return Version.ToString();
-        }
     }
 }
