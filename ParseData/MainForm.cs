@@ -29,6 +29,7 @@ namespace ParseData
 
         private void LoadButton_click(object sender, EventArgs e)
         {
+            openFileDialog.FileName = "*Strings.resx";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 treeView1.Nodes.Clear();
