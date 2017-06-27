@@ -396,6 +396,7 @@
             // openFileDialog
             // 
             this.openFileDialog.DefaultExt = "resx";
+            this.openFileDialog.FileName = "*Strings.Resx";
             this.openFileDialog.Filter = "Resx Files|*.resx";
             this.openFileDialog.Title = "Open Master RESX File";
             // 
