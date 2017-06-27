@@ -121,7 +121,7 @@ namespace ParseData
         {
             if (parentTn.Level == 2) parentTn = parentTn.Parent.Parent;
             else if (parentTn.Level == 1) parentTn = parentTn.Parent;
-            TreeNode newTvn = new TreeNode(data.KeyName);
+            TreeNode newTvn = parentTn.Nodes.Add(data.KeyName, data.KeyName);
             TreeNode newTextTvn = new TreeNode(data.Text);
             newTvn.Nodes.Add(newTextTvn);
             bool isEnglish = DocumentDescriptor.IsEnglishFromTag(parentTn.Tag);
@@ -161,7 +161,7 @@ namespace ParseData
             newTvn.ForeColor = System.Drawing.Color.Blue;
             parentTn.ForeColor = System.Drawing.Color.Blue;
             
-            parentTn.Nodes.Add(newTvn);
+            //parentTn.Nodes.Add(newTvn);
         }
 
         static public void DeleteTreeNode(string key, TreeNode parentTn)
