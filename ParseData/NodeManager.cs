@@ -29,7 +29,8 @@ namespace ParseData
             var d = doc.Root.Elements("data");
             foreach (XElement elem in d)
             {
-                var nameNode = new TreeNode(elem.FirstAttribute.Value);
+                var nameNode = parentItem.Nodes.Add(elem.FirstAttribute.Value, elem.FirstAttribute.Value);
+                //var nameNode = new TreeNode(elem.FirstAttribute.Value);
                 nameNode.Tag = elem;
                 var valueNode = elem.Elements("value").First();
                 var commentNode = elem.Elements("comment").First();
@@ -41,8 +42,7 @@ namespace ParseData
                 nameNode.Nodes.Add(commentItem);
                 nameNode.Nodes[0].Name = "1"; // for sorting
                 nameNode.Nodes[1].Name = "2";
-
-                parentItem.Nodes.Add(nameNode);
+                //parentItem.Nodes.Add(nameNode);
             }
             treeView.Nodes.Add(parentItem);
         }
@@ -74,7 +74,7 @@ namespace ParseData
             if (parentTn.Level == 2) parentTn = parentTn.Parent.Parent;
             else if (parentTn.Level == 1) parentTn = parentTn.Parent;
             bool found = false;
-            var tNode = parentTn.Nodes.OfType<TreeNode>().FirstOrDefault(n => n.Text == data.KeyName);
+            var tNode = parentTn.Nodes[data.KeyName];
             if (tNode != null)
             {
                 found = true;
