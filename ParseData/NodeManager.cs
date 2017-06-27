@@ -32,10 +32,10 @@ namespace ParseData
                 var nameNode = parentItem.Nodes.Add(elem.FirstAttribute.Value, elem.FirstAttribute.Value);
                 //var nameNode = new TreeNode(elem.FirstAttribute.Value);
                 nameNode.Tag = elem;
-                var valueNode = elem.Elements("value").First();
-                var commentNode = elem.Elements("comment").First();
-                var valueText = valueNode.Value;
-                var commentText = commentNode.Value;
+                var valueNode = elem.Elements("value").FirstOrDefault();
+                var commentNode = elem.Elements("comment").FirstOrDefault();
+                string valueText = valueNode != null ? valueNode.Value : "-------";
+                var commentText = commentNode != null ? commentNode.Value : "";
                 var valueItem = new TreeNode(valueText);
                 var commentItem = new TreeNode(commentText);
                 nameNode.Nodes.Add(valueItem);
