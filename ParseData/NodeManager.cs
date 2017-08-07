@@ -64,7 +64,8 @@ namespace ParseData
             }
             nodeData.KeyName = node.Attribute("name").Value;
             nodeData.Text = node.Element("value").Value;
-            if (isMaster || isEnglish) nodeData.Comment = node.Element("comment").Value;
+            XElement commentElem = node.Element("comment");
+            if (isMaster || isEnglish) nodeData.Comment = commentElem != null ? commentElem.Value : "";
             else nodeData.TranslateComment = node.Element("comment").Value;
             return nodeData;
         }
