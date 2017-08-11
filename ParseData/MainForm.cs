@@ -103,11 +103,11 @@ namespace ParseData
             data.TranslateComment = TranslateCommentEdit.Text;
 
             var selectedResxNode = treeView1.Nodes[0];
-            NodeManager.AddNewNodeToTreeNode(data, selectedResxNode, true);
+            NodeManager.AddNewNodeToTreeNode(true, data, selectedResxNode, true);
             var nodes = treeView2.Nodes;
             foreach (TreeNode tn in nodes)
             {
-                NodeManager.AddNewNodeToTreeNode(data, tn, false);
+                NodeManager.AddNewNodeToTreeNode(true, data, tn, false);
             }
 
             AddAllButton.Visible = false;
@@ -347,6 +347,11 @@ namespace ParseData
             treeView2.SelectedNode = null;
         }
 
+        private void MissingButton_Click(object sender, EventArgs e)
+        {
+            NodeManager.CopyClipboardMissing(treeView1);
+
+        }
     }
 }
 

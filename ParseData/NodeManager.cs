@@ -48,7 +48,7 @@ namespace ParseData
                 doc = XDocument.Load(addingResxFileLang);
                 parentItem.Tag = new DocumentDescriptor(doc, baseResxFileLang); // combining two files
                 var d = doc.Root.Elements("data");
-                MergeDocIntoTree(merge, parentItem, d, isMaster);
+                MergeDocIntoTree(isCombining, merge, parentItem, d, isMaster);
                 treeView.Nodes.Add(parentItem);
             }
             else
@@ -57,16 +57,16 @@ namespace ParseData
                 doc = dd.Document;
                 var doc2 = XDocument.Load(addingResxFileLang);
                 var d = doc2.Root.Elements("data");
-                MergeDocIntoTree(merge, parentItem, d, isMaster);
+                MergeDocIntoTree(isCombining, merge, parentItem, d, isMaster);
             }
         }
 
-        private static void MergeDocIntoTree(bool combine, TreeNode parentItem, IEnumerable<XElement> d, bool isMaster)
+        private static void MergeDocIntoTree(bool isCombining, bool isMerging, TreeNode parentItem, IEnumerable<XElement> d, bool isMaster)
         {
             foreach (XElement elem in d)
             {
                 elem.FirstAttribute.Value = elem.FirstAttribute.Value.Trim().ToUpper();
-                if (!combine && DataExists(elem.FirstAttribute.Value, parentItem)) continue;
+                if (!isMerging && DataExists(elem.FirstAttribute.Value, parentItem)) continue;
 
                 string key = elem.FirstAttribute.Value;
                 var valueNode = elem.Elements("value").FirstOrDefault();
@@ -81,7 +81,7 @@ namespace ParseData
                 var nameNode = parentItem.Nodes[key];
                 if (nameNode == null)
                 {
-                    AddNewNodeToTreeNode(data, parentItem, isMaster);
+                    AddNewNodeToTreeNode(isCombining, data, parentItem, isMaster);
                 }
                 else
                 {
@@ -180,7 +180,7 @@ namespace ParseData
             return found;
         }
 
-        static public void AddNewNodeToTreeNode(NodeData data, TreeNode parentTn, bool isMaster)
+        static public void AddNewNodeToTreeNode(bool isCombining, NodeData data, TreeNode parentTn, bool isMaster)
         {
             if (parentTn.Level == 2) parentTn = parentTn.Parent.Parent;
             else if (parentTn.Level == 1) parentTn = parentTn.Parent;
@@ -202,24 +202,35 @@ namespace ParseData
             newTvn.Nodes[1].Name = "2";
 
             XDocument doc = DocumentDescriptor.DocFromTag(parentTn.Tag);
-            var nameElement = new XElement("data");
-            var nameAttr = new XAttribute("name",data.KeyName);
-            nameElement.Add(nameAttr);
-            var preserveAttr = new XAttribute(XNamespace.Xml + "space", "preserve");
-            nameElement.Add(preserveAttr);
-            var valueNode = new XElement("value",data.Text);
-            nameElement.Add(valueNode);
-            if (isMaster || isEnglish)
+
+            // if we are combining a second document, we need to create a new element and add it to the resx document
+            // note: otherwise we are just building the tree from the original document
+            if (isCombining)
             {
-                var commentNode = new XElement("comment", data.Comment);
-                nameElement.Add(commentNode);
+                var newElement = new XElement("data");
+                var nameAttr = new XAttribute("name", data.KeyName);
+                newElement.Add(nameAttr);
+                var preserveAttr = new XAttribute(XNamespace.Xml + "space", "preserve");
+                newElement.Add(preserveAttr);
+                var valueNode = new XElement("value", data.Text);
+                newElement.Add(valueNode);
+                if (isMaster || isEnglish)
+                {
+                    var commentNode = new XElement("comment", data.Comment);
+                    newElement.Add(commentNode);
+                }
+                else
+                {
+                    var commentNode = new XElement("comment", data.TranslateComment);
+                    newElement.Add(commentNode);
+                }
+
+                doc.Root.Add(newElement);
             }
-            else
-            {
-                var commentNode = new XElement("comment", data.TranslateComment);
-                nameElement.Add(commentNode);
-            }
-            doc.Root.Add(nameElement);
+
+            // we have either created a new element in the resx by combining, or are just building the tree
+            // either way we want to save the document element in the treenode's tag. So find the
+            // node (existing or newly created) in the resx file, and save it in the new treenode's tag
             var elems = doc.Root.Descendants("data").ToArray();
             var elem = elems.Where(d => (string)d.FirstAttribute.Value == data.KeyName).FirstOrDefault();
             newTvn.Tag = elem;
@@ -245,6 +256,33 @@ namespace ParseData
                     break;
                 }
             }
+        }
+
+        static public void CopyClipboardMissing(TreeView tv)
+        {
+            DocumentDescriptor desc = (DocumentDescriptor)tv.Nodes[0].Tag;
+            XDocument doc = desc.Document;
+            var d = doc.Root.Elements("data");
+            var lines = new List<string>();
+            foreach(XElement e in d)
+            {
+                string name = e.FirstAttribute.Value;
+                var valueNode = e.Elements("value").FirstOrDefault();
+                var commentNode = e.Elements("comment").FirstOrDefault();
+                if (valueNode == null || valueNode.Value == "" || valueNode.Value.StartsWith("***") || valueNode.Value.StartsWith("No Entry"))
+                {
+                    string valueText = valueNode == null ? "NULL" : valueNode.Value;
+                    string commentText = commentNode == null ? "NULL" : commentNode.Value;
+                    lines.Add(name + '\t' + valueText + "\t" + commentText);
+                }
+            }
+            StringBuilder sb = new StringBuilder();
+            foreach (var line in lines)
+            {
+                sb.Append(line);
+                sb.AppendLine();
+            }
+            Clipboard.SetText(sb.ToString(), TextDataFormat.UnicodeText);
         }
 
         static public void SaveAllFiles(TreeView tv1, TreeView tv2)
@@ -332,8 +370,6 @@ namespace ParseData
                 var lines = Clipboard.GetText().Split(new char[] { '\r', '\n' });
                 lines = lines.Where(l => !string.IsNullOrEmpty(l)).ToArray();
 
-                long maxCount = lines.Length * (slaveTv.Nodes.Count + 1) * parentTn.Nodes.Count;
-                long count = 0;
                 foreach (string line in lines)
                 {
                     var tokens = line.Split('\t');
@@ -344,6 +380,8 @@ namespace ParseData
                     if (tokens.Length > 1)
                     {
                         value = tokens[1];
+                        value = value.Replace(@"\n\n", @"<br>");
+                        value = value.Replace(@"\n", @"<br>");
                     }
 
                     NodeData nData = new NodeData();
@@ -354,7 +392,7 @@ namespace ParseData
 
                     if (!DataExists(nData, parentTn))
                     {
-                        AddNewNodeToTreeNode(nData, parentTn, true);
+                        AddNewNodeToTreeNode(true, nData, parentTn, true);
                     }
                     else if (merge) // exists and merging
                     {
@@ -365,13 +403,12 @@ namespace ParseData
                     {
                         if (!DataExists(nData, tn))
                         {
-                            AddNewNodeToTreeNode(nData, tn, false);
+                            AddNewNodeToTreeNode(true, nData, tn, false);
                         }
                         else if (merge) // exists and merging
                         {
                             SetNodeData(nData, tn, false);
                         }
-                        count++;
                     }
                 }
             }
@@ -379,92 +416,6 @@ namespace ParseData
             {
                 // swallow
             }
-        }
-
-        static private string ResxHeader = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<root>
-  <xsd:schema id = ""root"" xmlns="""" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:msdata=""urn:schemas-microsoft-com:xml-msdata"">
-    <xsd:import namespace=""http://www.w3.org/XML/1998/namespace"" />
-    <xsd:element name = ""root"" msdata:IsDataSet=""true"">
-      <xsd:complexType>
-        <xsd:choice maxOccurs = ""unbounded"" >
-          <xsd:element name = ""metadata"" >
-             <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name = ""value"" type=""xsd:string"" minOccurs=""0"" />
-              </xsd:sequence>
-              <xsd:attribute name = ""name"" use=""required"" type=""xsd:string"" />
-              <xsd:attribute name = ""type"" type=""xsd:string"" />
-              <xsd:attribute name = ""mimetype"" type=""xsd:string"" />
-              <xsd:attribute ref=""xml:space"" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name = ""assembly"" >
-            <xsd:complexType>
-              <xsd:attribute name = ""alias"" type=""xsd:string"" />
-              <xsd:attribute name = ""name"" type=""xsd:string"" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name = ""data"" >
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name = ""value"" type=""xsd:string"" minOccurs=""0"" msdata:Ordinal=""1"" />
-                <xsd:element name = ""comment"" type=""xsd:string"" minOccurs=""0"" msdata:Ordinal=""2"" />
-              </xsd:sequence>
-              <xsd:attribute name = ""name"" type=""xsd:string"" use=""required"" msdata:Ordinal=""1"" />
-              <xsd:attribute name = ""type"" type=""xsd:string"" msdata:Ordinal=""3"" />
-              <xsd:attribute name = ""mimetype"" type=""xsd:string"" msdata:Ordinal=""4"" />
-              <xsd:attribute ref=""xml:space"" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name = ""resheader"" >
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name = ""value"" type=""xsd:string"" minOccurs=""0"" msdata:Ordinal=""1"" />
-              </xsd:sequence>
-              <xsd:attribute name = ""name"" type=""xsd:string"" use=""required"" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name=""resmimetype"">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name=""version"" >
-    <value>2.0</value >
-  </resheader>
-  <resheader name=""reader"">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name=""writer"" >
-    <value> System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-";
-
-        static public void CreateFromTabDelimited(string inputFile, string outputFile, int column)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(ResxHeader);
-            string[] lines = File.ReadAllLines(inputFile);
-            for(var i=3; i < lines.Length; i++)
-            {
-                string[] tokens = lines[i].Split('\t');
-                if (tokens[3] != "" && tokens[3].Trim() != "OPERATOR ATTENTION")
-                {
-                    string key = tokens[3].Trim() + '-' + tokens[4].Trim();
-                    key = key.ToUpper();
-                    key = key.Replace("<", "&lt;");
-                    key = key.Replace(">", "&gt;");
-                    string value = tokens[column].Replace("\\n","&lt;br&gt;");
-                    value = value.Trim();
-                    sb.AppendFormat("\t<data name=\"{0}\" xml:space=\"preserve\" >\r\n\t\t<value>{1}</value>\r\n\t</data>\r\n", key, value);
-                }
-            }
-            sb.Append("</root>");
-            string output = sb.ToString();
-            File.WriteAllText(outputFile,output,Encoding.UTF8);
         }
 
         static public string[] GetLanguages()
