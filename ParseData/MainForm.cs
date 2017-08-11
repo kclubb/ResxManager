@@ -15,8 +15,8 @@ namespace ParseData
 {
     public partial class MainForm : Form
     {
-        private string genericResx;
         private TreeNode selectedNode;
+        private string baseResxFile = null;
 
         public MainForm()
         {
@@ -29,22 +29,58 @@ namespace ParseData
 
         private void LoadButton_click(object sender, EventArgs e)
         {
+            foreach (TreeNode cn in treeView1.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+            foreach (TreeNode cn in treeView2.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
             openFileDialog.FileName = "*Strings.resx";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                baseResxFile = openFileDialog.FileName;
                 treeView1.Nodes.Clear();
                 treeView2.Nodes.Clear();
-                genericResx = openFileDialog.FileName;
-                NodeManager.AddResxToTreeView(genericResx, genericResx, treeView1, GenerateMissingCheckbox.Checked);
-                var filenames = NodeManager.GetResxFileNames(genericResx);
-                foreach (string fileName in filenames)
+                NodeManager.AddResxToTreeView(false, baseResxFile, baseResxFile, null, treeView1, GenerateMissingCheckbox.Checked, MergeCb.Checked, true);
+                var languages = NodeManager.GetLanguages();
+                foreach (string language in languages)
                 {
-                    NodeManager.AddResxToTreeView(genericResx, fileName, treeView2, GenerateMissingCheckbox.Checked);
+                    string fileName = NodeManager.LangToFileName(baseResxFile, language);
+                    NodeManager.AddResxToTreeView(false, baseResxFile, baseResxFile, language, treeView2, GenerateMissingCheckbox.Checked, MergeCb.Checked, false);
                 }
                 NewButton.Visible = true;
             }
         }
 
+        private void AddButton_Click(object sender, EventArgs e)
+        {
+            foreach (TreeNode cn in treeView1.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+            foreach (TreeNode cn in treeView2.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+            openFileDialog.FileName = "*Strings.resx";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string addingGenericResxFile = openFileDialog.FileName;
+                NodeManager.AddResxToTreeView(true, baseResxFile, addingGenericResxFile, null, treeView1, GenerateMissingCheckbox.Checked, MergeCb.Checked, true);
+                var languages = NodeManager.GetLanguages();
+                foreach (string language in languages)
+                {
+                    string fileName = NodeManager.LangToFileName(addingGenericResxFile, language);
+                    if (File.Exists(fileName))
+                    {
+                        NodeManager.AddResxToTreeView(true, baseResxFile, addingGenericResxFile, language, treeView2, GenerateMissingCheckbox.Checked, MergeCb.Checked, false);
+                    }
+                }
+                NewButton.Visible = true;
+            }
+        }
         private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
 
@@ -52,6 +88,14 @@ namespace ParseData
 
         private void AddAllButton_click(object sender, EventArgs e)
         {
+            foreach (TreeNode cn in treeView1.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+            foreach (TreeNode cn in treeView2.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
             var data = new NodeData();
             data.KeyName = KeyEdit.Text;
             data.Text = ValueEdit.Text;
@@ -88,11 +132,28 @@ namespace ParseData
 
         private void SaveButton_click(object sender, EventArgs e)
         {
+            foreach (TreeNode cn in treeView1.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+            foreach (TreeNode cn in treeView2.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
             NodeManager.SaveAllFiles(treeView1, treeView2);
         }
 
         private void ApplyChangeButton_click(object sender, EventArgs e)
         {
+            foreach (TreeNode cn in treeView1.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+            foreach (TreeNode cn in treeView2.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+
             this.Cursor = Cursors.WaitCursor;
             var data = new NodeData();
             data.KeyName = KeyEdit.Text;
@@ -217,8 +278,16 @@ namespace ParseData
 
         private void PasteTddButton_Click(object sender, EventArgs e)
         {
+            foreach (TreeNode cn in treeView1.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
+            foreach (TreeNode cn in treeView2.Nodes)
+            {
+                NodeManager.ClearColor(cn);
+            }
             this.Cursor = Cursors.WaitCursor;
-            NodeManager.InsertUpdateNodeTddClipboard(selectedNode, treeView2);
+            NodeManager.InsertUpdateNodeTddClipboard(selectedNode, treeView2, MergeCb.Checked);
             this.Cursor = Cursors.Default;
         }
 
@@ -277,5 +346,7 @@ namespace ParseData
         {
             treeView2.SelectedNode = null;
         }
+
     }
 }
+

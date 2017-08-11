@@ -40,6 +40,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.MergeCb = new System.Windows.Forms.CheckBox();
             this.GenerateMissingCheckbox = new System.Windows.Forms.CheckBox();
             this.NewButton = new System.Windows.Forms.Button();
             this.KeyEditLabel = new System.Windows.Forms.Label();
@@ -60,6 +61,9 @@
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.PasteJSButton = new System.Windows.Forms.Button();
             this.PasteTddButton = new System.Windows.Forms.Button();
+            this.openFileDialogTabDelimited = new System.Windows.Forms.OpenFileDialog();
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.AddButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -196,6 +200,8 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.AddButton);
+            this.panel1.Controls.Add(this.MergeCb);
             this.panel1.Controls.Add(this.GenerateMissingCheckbox);
             this.panel1.Controls.Add(this.LoadButton);
             this.panel1.Controls.Add(this.SaveButton);
@@ -205,10 +211,20 @@
             this.panel1.Size = new System.Drawing.Size(1028, 47);
             this.panel1.TabIndex = 10;
             // 
+            // MergeCb
+            // 
+            this.MergeCb.AutoSize = true;
+            this.MergeCb.Location = new System.Drawing.Point(174, 15);
+            this.MergeCb.Name = "MergeCb";
+            this.MergeCb.Size = new System.Drawing.Size(70, 21);
+            this.MergeCb.TabIndex = 24;
+            this.MergeCb.Text = "Merge";
+            this.MergeCb.UseVisualStyleBackColor = true;
+            // 
             // GenerateMissingCheckbox
             // 
             this.GenerateMissingCheckbox.AutoSize = true;
-            this.GenerateMissingCheckbox.Location = new System.Drawing.Point(122, 15);
+            this.GenerateMissingCheckbox.Location = new System.Drawing.Point(250, 15);
             this.GenerateMissingCheckbox.Name = "GenerateMissingCheckbox";
             this.GenerateMissingCheckbox.Size = new System.Drawing.Size(170, 21);
             this.GenerateMissingCheckbox.TabIndex = 20;
@@ -424,6 +440,25 @@
             this.PasteTddButton.Visible = false;
             this.PasteTddButton.Click += new System.EventHandler(this.PasteTddButton_Click);
             // 
+            // openFileDialogTabDelimited
+            // 
+            this.openFileDialogTabDelimited.DefaultExt = "*.txt";
+            // 
+            // folderBrowserDialog
+            // 
+            this.folderBrowserDialog.Description = "Resx Folder";
+            this.folderBrowserDialog.RootFolder = System.Environment.SpecialFolder.MyComputer;
+            // 
+            // AddButton
+            // 
+            this.AddButton.Location = new System.Drawing.Point(93, 9);
+            this.AddButton.Name = "AddButton";
+            this.AddButton.Size = new System.Drawing.Size(75, 31);
+            this.AddButton.TabIndex = 25;
+            this.AddButton.Text = "Add";
+            this.AddButton.UseVisualStyleBackColor = true;
+            this.AddButton.Click += new System.EventHandler(this.AddButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -485,6 +520,10 @@
         private System.Windows.Forms.Button ApplySingleMasterButton;
         private System.Windows.Forms.Button PasteJSButton;
         private System.Windows.Forms.Button PasteTddButton;
+        private System.Windows.Forms.OpenFileDialog openFileDialogTabDelimited;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+        private System.Windows.Forms.CheckBox MergeCb;
+        private System.Windows.Forms.Button AddButton;
     }
 }
 

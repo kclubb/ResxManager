@@ -8,43 +8,86 @@ using System.Windows.Forms;
 using System.IO;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace ParseData
 {
     public class NodeManager
     {
-        public static void AddResxToTreeView(string genericResxFilename, string resxFilename, TreeView treeView, bool generateMissing)
+        public static void AddResxToTreeView(bool isCombining, string baseResxFile, string addingResxFile, string language, TreeView treeView, bool generateMissing, bool merge, bool isMaster)
         {
-            if (!File.Exists(resxFilename))
+            string baseResxFileLang = LangToFileName(baseResxFile, language);
+            string addingResxFileLang = LangToFileName(addingResxFile, language);
+
+            // ensure file is created if generate missing is selected
+            if (!File.Exists(baseResxFileLang))
             {
                 if (generateMissing)
                 {
-                    File.Copy(genericResxFilename, resxFilename);
+                    File.Copy(baseResxFile, baseResxFileLang);
                 }
                 else return;
             }
-            TreeNode parentItem = new TreeNode(Path.GetFileName(resxFilename));
-            var doc = XDocument.Load(resxFilename);
-            parentItem.Tag = new DocumentDescriptor(doc, resxFilename);
-            var d = doc.Root.Elements("data");
+
+            string key = null;
+            if (language != null) // working on language treeview
+            {
+                key = Path.GetFileName(baseResxFileLang);
+            }
+            else
+            {
+                key = Path.GetFileName(baseResxFile);
+            }
+
+            TreeNode parentItem = treeView.Nodes[key];
+            XDocument doc = null;
+            if (parentItem == null)
+            {
+                parentItem = new TreeNode(Path.GetFileName(key));
+                parentItem.Name = Path.GetFileName(key);
+                doc = XDocument.Load(addingResxFileLang);
+                parentItem.Tag = new DocumentDescriptor(doc, baseResxFileLang); // combining two files
+                var d = doc.Root.Elements("data");
+                MergeDocIntoTree(merge, parentItem, d, isMaster);
+                treeView.Nodes.Add(parentItem);
+            }
+            else
+            {
+                DocumentDescriptor dd = (DocumentDescriptor)parentItem.Tag;
+                doc = dd.Document;
+                var doc2 = XDocument.Load(addingResxFileLang);
+                var d = doc2.Root.Elements("data");
+                MergeDocIntoTree(merge, parentItem, d, isMaster);
+            }
+        }
+
+        private static void MergeDocIntoTree(bool combine, TreeNode parentItem, IEnumerable<XElement> d, bool isMaster)
+        {
             foreach (XElement elem in d)
             {
-                var nameNode = parentItem.Nodes.Add(elem.FirstAttribute.Value, elem.FirstAttribute.Value);
-                //var nameNode = new TreeNode(elem.FirstAttribute.Value);
-                nameNode.Tag = elem;
+                elem.FirstAttribute.Value = elem.FirstAttribute.Value.Trim().ToUpper();
+                if (!combine && DataExists(elem.FirstAttribute.Value, parentItem)) continue;
+
+                string key = elem.FirstAttribute.Value;
                 var valueNode = elem.Elements("value").FirstOrDefault();
                 var commentNode = elem.Elements("comment").FirstOrDefault();
                 string valueText = valueNode != null ? valueNode.Value : "-------";
                 var commentText = commentNode != null ? commentNode.Value : "";
-                var valueItem = new TreeNode(valueText);
-                var commentItem = new TreeNode(commentText);
-                nameNode.Nodes.Add(valueItem);
-                nameNode.Nodes.Add(commentItem);
-                nameNode.Nodes[0].Name = "1"; // for sorting
-                nameNode.Nodes[1].Name = "2";
-                //parentItem.Nodes.Add(nameNode);
+                var data = new NodeData();
+                data.KeyName = key;
+                data.Text = valueText;
+                data.Comment = commentText;
+
+                var nameNode = parentItem.Nodes[key];
+                if (nameNode == null)
+                {
+                    AddNewNodeToTreeNode(data, parentItem, isMaster);
+                }
+                else
+                {
+                    SetNodeData(data, parentItem, isMaster);
+                }
             }
-            treeView.Nodes.Add(parentItem);
         }
 
         static public NodeData GetNodeData(TreeNode tNode, bool isMaster)
@@ -66,7 +109,7 @@ namespace ParseData
             nodeData.Text = node.Element("value").Value;
             XElement commentElem = node.Element("comment");
             if (isMaster || isEnglish) nodeData.Comment = commentElem != null ? commentElem.Value : "";
-            else nodeData.TranslateComment = node.Element("comment").Value;
+            else nodeData.TranslateComment              = commentElem != null ? commentElem.Value : "";
             return nodeData;
         }
 
@@ -80,11 +123,8 @@ namespace ParseData
             {
                 found = true;
                 XElement xNode = (XElement)tNode.Tag;
-                XDocument doc = DocumentDescriptor.DocFromTag(parentTn.Tag);
                 var isEnglish = DocumentDescriptor.IsEnglishFromTag(parentTn.Tag);
-                var elems = doc.Root.Descendants("data").ToArray();
-                var elem = elems.Where(d => (string)d.FirstAttribute.Value ==data.KeyName).FirstOrDefault();
-                if (data.Text != "") elem.Element("value").Value = data.Text;
+                if (data.Text != "") xNode.Element("value").Value = data.Text;
                 if (data.Text != "")
                 {
                     tNode.Nodes[0].Text = data.Text;
@@ -94,27 +134,49 @@ namespace ParseData
                 }
                 if (isMaster|| isEnglish)
                 {
-                    if (data.Comment != "")
+                    if (data.Comment != null && data.Comment != "")
                     {
-                        elem.Element("comment").Value = data.Comment;
+                        xNode.Element("comment").Value = data.Comment;
                         tNode.Nodes[1].Text = data.Comment;
                         tNode.Nodes[1].ForeColor = System.Drawing.Color.Red;
                         tNode.ForeColor = System.Drawing.Color.Red;
                         parentTn.ForeColor = System.Drawing.Color.Red;
+                        tNode.Nodes[0].Name = "1"; // for sorting
+                        tNode.Nodes[1].Name = "2";
+
                     }
                 }
                 else
                 {
-                    if (data.TranslateComment != "")
+                    if (data.TranslateComment != null && data.TranslateComment != "")
                     {
-                        elem.Element("comment").Value = data.TranslateComment;
+                        xNode.Element("comment").Value = data.TranslateComment;
                         tNode.Nodes[1].Text = data.TranslateComment;
                         tNode.Nodes[1].ForeColor = System.Drawing.Color.Red;
                         tNode.ForeColor = System.Drawing.Color.Red;
                         parentTn.ForeColor = System.Drawing.Color.Red;
+                        tNode.Nodes[0].Name = "1"; // for sorting
+                        tNode.Nodes[1].Name = "2";
                     }
                 }
             }
+            return found;
+        }
+
+        static private bool DataExists(NodeData data, TreeNode parentTn)
+        {
+            if (parentTn.Level == 2) parentTn = parentTn.Parent.Parent;
+            else if (parentTn.Level == 1) parentTn = parentTn.Parent;
+            var tNode = parentTn.Nodes[data.KeyName];
+            bool found = (tNode != null);
+            return found;
+        }
+        static private bool DataExists(string key, TreeNode parentTn)
+        {
+            if (parentTn.Level == 2) parentTn = parentTn.Parent.Parent;
+            else if (parentTn.Level == 1) parentTn = parentTn.Parent;
+            var tNode = parentTn.Nodes[key];
+            bool found = (tNode != null);
             return found;
         }
 
@@ -158,11 +220,9 @@ namespace ParseData
                 nameElement.Add(commentNode);
             }
             doc.Root.Add(nameElement);
-            newTvn.Tag = nameElement;
-            newTvn.ForeColor = System.Drawing.Color.Blue;
-            parentTn.ForeColor = System.Drawing.Color.Blue;
-            
-            //parentTn.Nodes.Add(newTvn);
+            var elems = doc.Root.Descendants("data").ToArray();
+            var elem = elems.Where(d => (string)d.FirstAttribute.Value == data.KeyName).FirstOrDefault();
+            newTvn.Tag = elem;
         }
 
         static public void DeleteTreeNode(string key, TreeNode parentTn)
@@ -249,7 +309,7 @@ namespace ParseData
                 // swallow
             }
         }
-        static public void InsertUpdateNodeTddClipboard(TreeNode parentTn, TreeView slaveTv)
+        static public void InsertUpdateNodeTddClipboard(TreeNode parentTn, TreeView slaveTv, bool merge)
         {
             try
             {
@@ -271,11 +331,20 @@ namespace ParseData
                 }
                 var lines = Clipboard.GetText().Split(new char[] { '\r', '\n' });
                 lines = lines.Where(l => !string.IsNullOrEmpty(l)).ToArray();
+
+                long maxCount = lines.Length * (slaveTv.Nodes.Count + 1) * parentTn.Nodes.Count;
+                long count = 0;
                 foreach (string line in lines)
                 {
                     var tokens = line.Split('\t');
-                    string name = tokens[0];
-                    string value = tokens[1];
+                    string name = tokens[0].Trim().ToUpper();
+                    if (name[0] == '-' || (name.Length > 18 && name.Substring(0,18) == "OPERATOR ATTENTION")) continue;
+
+                    string value = "*** UNKNOWN ***";
+                    if (tokens.Length > 1)
+                    {
+                        value = tokens[1];
+                    }
 
                     NodeData nData = new NodeData();
                     nData.KeyName = prefix + name;
@@ -283,34 +352,123 @@ namespace ParseData
                     nData.Comment = "PLEASE REVIEW";
                     nData.TranslateComment = "PLEASE TRANSLATE";
 
-                    if (SetNodeData(nData, parentTn, true))
-                    {
-                        foreach (TreeNode tn in slaveTv.Nodes)
-                        {
-                            NodeManager.SetNodeData(nData, tn, false);
-                        }
-                    }
-                    else
+                    if (!DataExists(nData, parentTn))
                     {
                         AddNewNodeToTreeNode(nData, parentTn, true);
-                        foreach (TreeNode tn in slaveTv.Nodes)
+                    }
+                    else if (merge) // exists and merging
+                    {
+                        SetNodeData(nData, parentTn, true);
+                    }
+
+                    foreach (TreeNode tn in slaveTv.Nodes)
+                    {
+                        if (!DataExists(nData, tn))
                         {
-                            NodeManager.AddNewNodeToTreeNode(nData, tn, false);
+                            AddNewNodeToTreeNode(nData, tn, false);
                         }
+                        else if (merge) // exists and merging
+                        {
+                            SetNodeData(nData, tn, false);
+                        }
+                        count++;
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
                 // swallow
             }
         }
 
+        static private string ResxHeader = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<root>
+  <xsd:schema id = ""root"" xmlns="""" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:msdata=""urn:schemas-microsoft-com:xml-msdata"">
+    <xsd:import namespace=""http://www.w3.org/XML/1998/namespace"" />
+    <xsd:element name = ""root"" msdata:IsDataSet=""true"">
+      <xsd:complexType>
+        <xsd:choice maxOccurs = ""unbounded"" >
+          <xsd:element name = ""metadata"" >
+             <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name = ""value"" type=""xsd:string"" minOccurs=""0"" />
+              </xsd:sequence>
+              <xsd:attribute name = ""name"" use=""required"" type=""xsd:string"" />
+              <xsd:attribute name = ""type"" type=""xsd:string"" />
+              <xsd:attribute name = ""mimetype"" type=""xsd:string"" />
+              <xsd:attribute ref=""xml:space"" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name = ""assembly"" >
+            <xsd:complexType>
+              <xsd:attribute name = ""alias"" type=""xsd:string"" />
+              <xsd:attribute name = ""name"" type=""xsd:string"" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name = ""data"" >
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name = ""value"" type=""xsd:string"" minOccurs=""0"" msdata:Ordinal=""1"" />
+                <xsd:element name = ""comment"" type=""xsd:string"" minOccurs=""0"" msdata:Ordinal=""2"" />
+              </xsd:sequence>
+              <xsd:attribute name = ""name"" type=""xsd:string"" use=""required"" msdata:Ordinal=""1"" />
+              <xsd:attribute name = ""type"" type=""xsd:string"" msdata:Ordinal=""3"" />
+              <xsd:attribute name = ""mimetype"" type=""xsd:string"" msdata:Ordinal=""4"" />
+              <xsd:attribute ref=""xml:space"" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name = ""resheader"" >
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name = ""value"" type=""xsd:string"" minOccurs=""0"" msdata:Ordinal=""1"" />
+              </xsd:sequence>
+              <xsd:attribute name = ""name"" type=""xsd:string"" use=""required"" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name=""resmimetype"">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name=""version"" >
+    <value>2.0</value >
+  </resheader>
+  <resheader name=""reader"">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name=""writer"" >
+    <value> System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+";
 
-        static public string[] GetResxFileNames(string genericResx)
+        static public void CreateFromTabDelimited(string inputFile, string outputFile, int column)
         {
-            string dir = Path.GetDirectoryName(genericResx);
-            string root = Path.GetFileNameWithoutExtension(genericResx);
+            StringBuilder sb = new StringBuilder();
+            sb.Append(ResxHeader);
+            string[] lines = File.ReadAllLines(inputFile);
+            for(var i=3; i < lines.Length; i++)
+            {
+                string[] tokens = lines[i].Split('\t');
+                if (tokens[3] != "" && tokens[3].Trim() != "OPERATOR ATTENTION")
+                {
+                    string key = tokens[3].Trim() + '-' + tokens[4].Trim();
+                    key = key.ToUpper();
+                    key = key.Replace("<", "&lt;");
+                    key = key.Replace(">", "&gt;");
+                    string value = tokens[column].Replace("\\n","&lt;br&gt;");
+                    value = value.Trim();
+                    sb.AppendFormat("\t<data name=\"{0}\" xml:space=\"preserve\" >\r\n\t\t<value>{1}</value>\r\n\t</data>\r\n", key, value);
+                }
+            }
+            sb.Append("</root>");
+            string output = sb.ToString();
+            File.WriteAllText(outputFile,output,Encoding.UTF8);
+        }
+
+        static public string[] GetLanguages()
+        {
             string[] langs = new string[]
             {
                 "cs-cz",
@@ -343,12 +501,25 @@ namespace ParseData
                 "zh-tw",
                 "zh"
             };
-            var filenames = langs.Select(r => {
-                var tmp = Path.Combine(dir, root);
-                tmp += "." + r + ".resx";
-                return tmp;
-            });
-            return filenames.ToArray();
+            return langs;
+        }
+        static public string LangToFileName(string genericResx, string lang)
+        {
+            if (lang == null) return genericResx;
+
+            string dir = Path.GetDirectoryName(genericResx);
+            string root = Path.GetFileNameWithoutExtension(genericResx);
+            var tmp = Path.Combine(dir, root);
+            tmp += "." + lang + ".resx";
+            return tmp;
+        }
+        static public void ClearColor(TreeNode tn)
+        {
+            tn.ForeColor = System.Drawing.Color.Black;
+            foreach(TreeNode cn in tn.Nodes)
+            {
+                ClearColor(cn);
+            }
         }
     }
 }
