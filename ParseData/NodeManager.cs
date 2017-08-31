@@ -121,8 +121,10 @@ namespace ParseData
             var tNode = parentTn.Nodes[data.KeyName];
             if (tNode != null)
             {
-                found = true;
                 XElement xNode = (XElement)tNode.Tag;
+                if (xNode == null) return found;
+
+                found = true;
                 var isEnglish = DocumentDescriptor.IsEnglishFromTag(parentTn.Tag);
                 if (data.Text != "") xNode.Element("value").Value = data.Text;
                 if (data.Text != "")
