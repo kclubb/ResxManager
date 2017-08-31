@@ -40,6 +40,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.MissingButton = new System.Windows.Forms.Button();
             this.AddButton = new System.Windows.Forms.Button();
             this.MergeCb = new System.Windows.Forms.CheckBox();
             this.GenerateMissingCheckbox = new System.Windows.Forms.CheckBox();
@@ -64,7 +65,7 @@
             this.PasteTddButton = new System.Windows.Forms.Button();
             this.openFileDialogTabDelimited = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.MissingButton = new System.Windows.Forms.Button();
+            this.CopyAllButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -201,6 +202,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.CopyAllButton);
             this.panel1.Controls.Add(this.MissingButton);
             this.panel1.Controls.Add(this.AddButton);
             this.panel1.Controls.Add(this.MergeCb);
@@ -212,6 +214,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1028, 47);
             this.panel1.TabIndex = 10;
+            // 
+            // MissingButton
+            // 
+            this.MissingButton.Location = new System.Drawing.Point(426, 9);
+            this.MissingButton.Name = "MissingButton";
+            this.MissingButton.Size = new System.Drawing.Size(75, 31);
+            this.MissingButton.TabIndex = 26;
+            this.MissingButton.Text = "Missing";
+            this.MissingButton.UseVisualStyleBackColor = true;
+            this.MissingButton.Click += new System.EventHandler(this.MissingButton_Click);
             // 
             // AddButton
             // 
@@ -461,15 +473,15 @@
             this.folderBrowserDialog.Description = "Resx Folder";
             this.folderBrowserDialog.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
-            // MissingButton
+            // CopyAllButton
             // 
-            this.MissingButton.Location = new System.Drawing.Point(477, 8);
-            this.MissingButton.Name = "MissingButton";
-            this.MissingButton.Size = new System.Drawing.Size(75, 31);
-            this.MissingButton.TabIndex = 26;
-            this.MissingButton.Text = "Missing";
-            this.MissingButton.UseVisualStyleBackColor = true;
-            this.MissingButton.Click += new System.EventHandler(this.MissingButton_Click);
+            this.CopyAllButton.Location = new System.Drawing.Point(507, 9);
+            this.CopyAllButton.Name = "CopyAllButton";
+            this.CopyAllButton.Size = new System.Drawing.Size(75, 31);
+            this.CopyAllButton.TabIndex = 27;
+            this.CopyAllButton.Text = "All";
+            this.CopyAllButton.UseVisualStyleBackColor = true;
+            this.CopyAllButton.Click += new System.EventHandler(this.CopyAllButton_Click);
             // 
             // MainForm
             // 
@@ -537,6 +549,7 @@
         private System.Windows.Forms.CheckBox MergeCb;
         private System.Windows.Forms.Button AddButton;
         private System.Windows.Forms.Button MissingButton;
+        private System.Windows.Forms.Button CopyAllButton;
     }
 }
 

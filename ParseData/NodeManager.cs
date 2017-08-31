@@ -258,7 +258,7 @@ namespace ParseData
             }
         }
 
-        static public void CopyClipboardMissing(TreeView tv)
+        static public void CopyClipboardMissing(TreeView tv, bool missingOnly)
         {
             DocumentDescriptor desc = (DocumentDescriptor)tv.Nodes[0].Tag;
             XDocument doc = desc.Document;
@@ -269,7 +269,7 @@ namespace ParseData
                 string name = e.FirstAttribute.Value;
                 var valueNode = e.Elements("value").FirstOrDefault();
                 var commentNode = e.Elements("comment").FirstOrDefault();
-                if (valueNode == null || valueNode.Value == "" || valueNode.Value.StartsWith("***") || valueNode.Value.StartsWith("No Entry"))
+                if (!missingOnly || (missingOnly && (valueNode == null || valueNode.Value == "" || valueNode.Value.StartsWith("***"))))
                 {
                     string valueText = valueNode == null ? "NULL" : valueNode.Value;
                     string commentText = commentNode == null ? "NULL" : commentNode.Value;

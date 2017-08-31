@@ -349,8 +349,13 @@ namespace ParseData
 
         private void MissingButton_Click(object sender, EventArgs e)
         {
-            NodeManager.CopyClipboardMissing(treeView1);
+            NodeManager.CopyClipboardMissing(treeView1, true);
 
+        }
+
+        private void CopyAllButton_Click(object sender, EventArgs e)
+        {
+            NodeManager.CopyClipboardMissing(treeView1, false);
         }
     }
 }
