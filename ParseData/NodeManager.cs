@@ -65,7 +65,7 @@ namespace ParseData
         {
             foreach (XElement elem in d)
             {
-                elem.FirstAttribute.Value = elem.FirstAttribute.Value.Trim().ToUpper();
+                elem.FirstAttribute.Value = elem.FirstAttribute.Value.Trim();
                 if (!isMerging && DataExists(elem.FirstAttribute.Value, parentItem)) continue;
 
                 string key = elem.FirstAttribute.Value;
@@ -375,7 +375,7 @@ namespace ParseData
                 foreach (string line in lines)
                 {
                     var tokens = line.Split('\t');
-                    string name = tokens[0].Trim().ToUpper();
+                    string name = tokens[0].Trim();
                     if (name[0] == '-' || (name.Length > 18 && name.Substring(0,18) == "OPERATOR ATTENTION")) continue;
 
                     string value = "*** UNKNOWN ***";

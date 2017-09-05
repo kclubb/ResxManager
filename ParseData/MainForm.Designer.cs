@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.LoadButton = new System.Windows.Forms.Button();
             this.treeView2 = new System.Windows.Forms.TreeView();
@@ -40,6 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.CopyAllButton = new System.Windows.Forms.Button();
             this.MissingButton = new System.Windows.Forms.Button();
             this.AddButton = new System.Windows.Forms.Button();
             this.MergeCb = new System.Windows.Forms.CheckBox();
@@ -65,7 +67,7 @@
             this.PasteTddButton = new System.Windows.Forms.Button();
             this.openFileDialogTabDelimited = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.CopyAllButton = new System.Windows.Forms.Button();
+            this.missingToolTip = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -95,6 +97,7 @@
             this.LoadButton.Size = new System.Drawing.Size(75, 31);
             this.LoadButton.TabIndex = 1;
             this.LoadButton.Text = "Load";
+            this.missingToolTip.SetToolTip(this.LoadButton, "Load a new resx file");
             this.LoadButton.UseVisualStyleBackColor = true;
             this.LoadButton.Click += new System.EventHandler(this.LoadButton_click);
             // 
@@ -215,6 +218,17 @@
             this.panel1.Size = new System.Drawing.Size(1028, 47);
             this.panel1.TabIndex = 10;
             // 
+            // CopyAllButton
+            // 
+            this.CopyAllButton.Location = new System.Drawing.Point(507, 9);
+            this.CopyAllButton.Name = "CopyAllButton";
+            this.CopyAllButton.Size = new System.Drawing.Size(75, 31);
+            this.CopyAllButton.TabIndex = 27;
+            this.CopyAllButton.Text = "All";
+            this.missingToolTip.SetToolTip(this.CopyAllButton, "Copy all items to clipboard");
+            this.CopyAllButton.UseVisualStyleBackColor = true;
+            this.CopyAllButton.Click += new System.EventHandler(this.CopyAllButton_Click);
+            // 
             // MissingButton
             // 
             this.MissingButton.Location = new System.Drawing.Point(426, 9);
@@ -222,6 +236,7 @@
             this.MissingButton.Size = new System.Drawing.Size(75, 31);
             this.MissingButton.TabIndex = 26;
             this.MissingButton.Text = "Missing";
+            this.missingToolTip.SetToolTip(this.MissingButton, "Copy items with *** UNKNOWN *** in value \r\nto the clipboard");
             this.MissingButton.UseVisualStyleBackColor = true;
             this.MissingButton.Click += new System.EventHandler(this.MissingButton_Click);
             // 
@@ -232,6 +247,7 @@
             this.AddButton.Size = new System.Drawing.Size(75, 31);
             this.AddButton.TabIndex = 25;
             this.AddButton.Text = "Add";
+            this.missingToolTip.SetToolTip(this.AddButton, "Add new resx file to existing tree/resx file");
             this.AddButton.UseVisualStyleBackColor = true;
             this.AddButton.Click += new System.EventHandler(this.AddButton_Click);
             // 
@@ -243,6 +259,7 @@
             this.MergeCb.Size = new System.Drawing.Size(70, 21);
             this.MergeCb.TabIndex = 24;
             this.MergeCb.Text = "Merge";
+            this.missingToolTip.SetToolTip(this.MergeCb, "Allow updates to existing items value and comment \r\nwhen using Paste TDD and Add");
             this.MergeCb.UseVisualStyleBackColor = true;
             // 
             // GenerateMissingCheckbox
@@ -460,6 +477,7 @@
             this.PasteTddButton.Size = new System.Drawing.Size(91, 31);
             this.PasteTddButton.TabIndex = 23;
             this.PasteTddButton.Text = "Paste TDD";
+            this.missingToolTip.SetToolTip(this.PasteTddButton, "Paste tab delimited data from clipboard");
             this.PasteTddButton.UseVisualStyleBackColor = true;
             this.PasteTddButton.Visible = false;
             this.PasteTddButton.Click += new System.EventHandler(this.PasteTddButton_Click);
@@ -472,16 +490,6 @@
             // 
             this.folderBrowserDialog.Description = "Resx Folder";
             this.folderBrowserDialog.RootFolder = System.Environment.SpecialFolder.MyComputer;
-            // 
-            // CopyAllButton
-            // 
-            this.CopyAllButton.Location = new System.Drawing.Point(507, 9);
-            this.CopyAllButton.Name = "CopyAllButton";
-            this.CopyAllButton.Size = new System.Drawing.Size(75, 31);
-            this.CopyAllButton.TabIndex = 27;
-            this.CopyAllButton.Text = "All";
-            this.CopyAllButton.UseVisualStyleBackColor = true;
-            this.CopyAllButton.Click += new System.EventHandler(this.CopyAllButton_Click);
             // 
             // MainForm
             // 
@@ -550,6 +558,7 @@
         private System.Windows.Forms.Button AddButton;
         private System.Windows.Forms.Button MissingButton;
         private System.Windows.Forms.Button CopyAllButton;
+        private System.Windows.Forms.ToolTip missingToolTip;
     }
 }
 
