@@ -369,7 +369,7 @@ namespace ParseData
                     prefix = prefix.Substring(0, prefix.LastIndexOf(delimitor) + 1);
                     parentTn = parentTn.Parent;
                 }
-                var lines = Clipboard.GetText().Split(new char[] { '\r', '\n' });
+                var lines = Clipboard.GetText().Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                 lines = lines.Where(l => !string.IsNullOrEmpty(l)).ToArray();
 
                 foreach (string line in lines)
