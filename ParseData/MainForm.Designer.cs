@@ -254,6 +254,8 @@
             // MergeCb
             // 
             this.MergeCb.AutoSize = true;
+            this.MergeCb.Checked = true;
+            this.MergeCb.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MergeCb.Location = new System.Drawing.Point(174, 15);
             this.MergeCb.Name = "MergeCb";
             this.MergeCb.Size = new System.Drawing.Size(70, 21);
