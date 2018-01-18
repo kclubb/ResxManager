@@ -191,6 +191,7 @@ namespace ParseData
 
             NodeManager.SetNodeData(data, selectedNode, false);
         }
+
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             selectedNode = treeView1.SelectedNode;
@@ -356,6 +357,14 @@ namespace ParseData
         private void CopyAllButton_Click(object sender, EventArgs e)
         {
             NodeManager.CopyClipboardMissing(treeView1, false);
+        }
+
+        private void ValueEdit_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\r')
+            {
+                e.Handled = true;
+            }
         }
     }
 }

@@ -382,14 +382,36 @@ namespace ParseData
                     if (tokens.Length > 1)
                     {
                         value = tokens[1];
-                        value = value.Replace(@"\n\n", @"<br>");
+                        value = value.Replace(@"\n\n", @"<br><br>");
+                        value = value.Replace(@"\r\n", @"<br>");
                         value = value.Replace(@"\n", @"<br>");
+                        if (value[0].Equals('"'))
+                        {
+                            value = value.Remove(0, 1);
+                        }
+                        var len = value.Length;
+                        if (len > 0)
+                        {
+                            if (value[len-1].Equals('"'))
+                            {
+                                value = value.Remove(len - 1, 1);
+                            }
+                        }
+                    }
+                    string comment = "PLEASE REVIEW";
+                    if (tokens.Length > 2)
+                    {
+                        string status = tokens[2];
+                        if (status.Equals("approved"))
+                        {
+                            comment = "Reviewed " + DateTime.Now.Date.ToShortDateString();
+                        }
                     }
 
                     NodeData nData = new NodeData();
                     nData.KeyName = prefix + name;
                     nData.Text = value;
-                    nData.Comment = "PLEASE REVIEW";
+                    nData.Comment = comment;
                     nData.TranslateComment = "PLEASE TRANSLATE";
 
                     if (!DataExists(nData, parentTn))

@@ -117,7 +117,7 @@
             // 
             // ApplyChangeButton
             // 
-            this.ApplyChangeButton.Location = new System.Drawing.Point(9, 330);
+            this.ApplyChangeButton.Location = new System.Drawing.Point(5, 474);
             this.ApplyChangeButton.Name = "ApplyChangeButton";
             this.ApplyChangeButton.Size = new System.Drawing.Size(106, 29);
             this.ApplyChangeButton.TabIndex = 3;
@@ -127,7 +127,7 @@
             // 
             // AddAllButton
             // 
-            this.AddAllButton.Location = new System.Drawing.Point(9, 295);
+            this.AddAllButton.Location = new System.Drawing.Point(5, 439);
             this.AddAllButton.Name = "AddAllButton";
             this.AddAllButton.Size = new System.Drawing.Size(104, 29);
             this.AddAllButton.TabIndex = 4;
@@ -137,7 +137,7 @@
             // 
             // DeleteButton
             // 
-            this.DeleteButton.Location = new System.Drawing.Point(124, 330);
+            this.DeleteButton.Location = new System.Drawing.Point(120, 474);
             this.DeleteButton.Name = "DeleteButton";
             this.DeleteButton.Size = new System.Drawing.Size(104, 29);
             this.DeleteButton.TabIndex = 5;
@@ -300,9 +300,12 @@
             // 
             this.ValueEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ValueEdit.Location = new System.Drawing.Point(5, 74);
+            this.ValueEdit.Multiline = true;
             this.ValueEdit.Name = "ValueEdit";
-            this.ValueEdit.Size = new System.Drawing.Size(322, 22);
+            this.ValueEdit.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ValueEdit.Size = new System.Drawing.Size(322, 160);
             this.ValueEdit.TabIndex = 13;
+            this.ValueEdit.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValueEdit_KeyPress);
             // 
             // ValueEditLabel
             // 
@@ -317,7 +320,7 @@
             // MasterCommentEdit
             // 
             this.MasterCommentEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.MasterCommentEdit.Location = new System.Drawing.Point(5, 123);
+            this.MasterCommentEdit.Location = new System.Drawing.Point(1, 267);
             this.MasterCommentEdit.Name = "MasterCommentEdit";
             this.MasterCommentEdit.Size = new System.Drawing.Size(322, 22);
             this.MasterCommentEdit.TabIndex = 15;
@@ -326,7 +329,7 @@
             // 
             this.MasterCommentEditLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.MasterCommentEditLabel.AutoSize = true;
-            this.MasterCommentEditLabel.Location = new System.Drawing.Point(5, 103);
+            this.MasterCommentEditLabel.Location = new System.Drawing.Point(1, 247);
             this.MasterCommentEditLabel.Name = "MasterCommentEditLabel";
             this.MasterCommentEditLabel.Size = new System.Drawing.Size(114, 17);
             this.MasterCommentEditLabel.TabIndex = 16;
@@ -336,7 +339,7 @@
             // 
             this.TranslateCommentEditLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.TranslateCommentEditLabel.AutoSize = true;
-            this.TranslateCommentEditLabel.Location = new System.Drawing.Point(5, 206);
+            this.TranslateCommentEditLabel.Location = new System.Drawing.Point(1, 350);
             this.TranslateCommentEditLabel.Name = "TranslateCommentEditLabel";
             this.TranslateCommentEditLabel.Size = new System.Drawing.Size(131, 17);
             this.TranslateCommentEditLabel.TabIndex = 18;
@@ -345,7 +348,7 @@
             // TranslateCommentEdit
             // 
             this.TranslateCommentEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.TranslateCommentEdit.Location = new System.Drawing.Point(5, 226);
+            this.TranslateCommentEdit.Location = new System.Drawing.Point(1, 370);
             this.TranslateCommentEdit.Name = "TranslateCommentEdit";
             this.TranslateCommentEdit.Size = new System.Drawing.Size(322, 22);
             this.TranslateCommentEdit.TabIndex = 17;
@@ -373,13 +376,13 @@
             this.ControlsPanel.Controls.Add(this.MasterCommentEdit);
             this.ControlsPanel.Location = new System.Drawing.Point(684, 114);
             this.ControlsPanel.Name = "ControlsPanel";
-            this.ControlsPanel.Size = new System.Drawing.Size(341, 411);
+            this.ControlsPanel.Size = new System.Drawing.Size(341, 570);
             this.ControlsPanel.TabIndex = 19;
             this.ControlsPanel.Visible = false;
             // 
             // ApplySingleMasterButton
             // 
-            this.ApplySingleMasterButton.Location = new System.Drawing.Point(9, 379);
+            this.ApplySingleMasterButton.Location = new System.Drawing.Point(5, 523);
             this.ApplySingleMasterButton.Name = "ApplySingleMasterButton";
             this.ApplySingleMasterButton.Size = new System.Drawing.Size(106, 29);
             this.ApplySingleMasterButton.TabIndex = 25;
@@ -389,7 +392,7 @@
             // 
             // ApplyChangeButton2
             // 
-            this.ApplyChangeButton2.Location = new System.Drawing.Point(9, 365);
+            this.ApplyChangeButton2.Location = new System.Drawing.Point(5, 509);
             this.ApplyChangeButton2.Name = "ApplyChangeButton2";
             this.ApplyChangeButton2.Size = new System.Drawing.Size(106, 29);
             this.ApplyChangeButton2.TabIndex = 24;
@@ -400,7 +403,7 @@
             // PleaseReviewLink2
             // 
             this.PleaseReviewLink2.AutoSize = true;
-            this.PleaseReviewLink2.Location = new System.Drawing.Point(234, 255);
+            this.PleaseReviewLink2.Location = new System.Drawing.Point(230, 399);
             this.PleaseReviewLink2.Name = "PleaseReviewLink2";
             this.PleaseReviewLink2.Size = new System.Drawing.Size(95, 17);
             this.PleaseReviewLink2.TabIndex = 23;
@@ -411,7 +414,7 @@
             // DoNotTranslateLink
             // 
             this.DoNotTranslateLink.AutoSize = true;
-            this.DoNotTranslateLink.Location = new System.Drawing.Point(119, 255);
+            this.DoNotTranslateLink.Location = new System.Drawing.Point(115, 399);
             this.DoNotTranslateLink.Name = "DoNotTranslateLink";
             this.DoNotTranslateLink.Size = new System.Drawing.Size(109, 17);
             this.DoNotTranslateLink.TabIndex = 22;
@@ -422,7 +425,7 @@
             // PleaseTranslateLink
             // 
             this.PleaseTranslateLink.AutoSize = true;
-            this.PleaseTranslateLink.Location = new System.Drawing.Point(3, 255);
+            this.PleaseTranslateLink.Location = new System.Drawing.Point(-1, 399);
             this.PleaseTranslateLink.Name = "PleaseTranslateLink";
             this.PleaseTranslateLink.Size = new System.Drawing.Size(110, 17);
             this.PleaseTranslateLink.TabIndex = 21;
@@ -433,7 +436,7 @@
             // ReviewedLink
             // 
             this.ReviewedLink.AutoSize = true;
-            this.ReviewedLink.Location = new System.Drawing.Point(104, 152);
+            this.ReviewedLink.Location = new System.Drawing.Point(100, 296);
             this.ReviewedLink.Name = "ReviewedLink";
             this.ReviewedLink.Size = new System.Drawing.Size(69, 17);
             this.ReviewedLink.TabIndex = 20;
@@ -444,7 +447,7 @@
             // PleaseReviewLink
             // 
             this.PleaseReviewLink.AutoSize = true;
-            this.PleaseReviewLink.Location = new System.Drawing.Point(3, 152);
+            this.PleaseReviewLink.Location = new System.Drawing.Point(-1, 296);
             this.PleaseReviewLink.Name = "PleaseReviewLink";
             this.PleaseReviewLink.Size = new System.Drawing.Size(95, 17);
             this.PleaseReviewLink.TabIndex = 19;
