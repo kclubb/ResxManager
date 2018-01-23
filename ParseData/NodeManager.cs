@@ -411,11 +411,11 @@ namespace ParseData
                     NodeData nData = new NodeData();
                     nData.KeyName = prefix + name;
                     nData.Text = value;
-                    nData.Comment = comment;
-                    nData.TranslateComment = "PLEASE TRANSLATE";
 
                     if (!DataExists(nData, parentTn))
                     {
+                        nData.Comment = comment;
+                        nData.TranslateComment = "PLEASE TRANSLATE";
                         AddNewNodeToTreeNode(true, nData, parentTn, true);
                     }
                     else if (merge) // exists and merging
