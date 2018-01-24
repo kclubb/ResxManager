@@ -125,6 +125,10 @@ namespace ParseData
                 if (xNode == null) return found;
 
                 found = true;
+
+                if (xNode.Element("comment").Value != null && xNode.Element("comment").Value == "TAPS not in Trima") return found;
+
+
                 var isEnglish = DocumentDescriptor.IsEnglishFromTag(parentTn.Tag);
                 if (data.Text != "") xNode.Element("value").Value = data.Text;
                 if (data.Text != "")
@@ -382,7 +386,8 @@ namespace ParseData
                     if (tokens.Length > 1)
                     {
                         value = tokens[1];
-                        value = value.Replace(@"\n\n", @"<br><br>");
+                        value = value.Replace(@"\n\n", @"<br>");
+                        value = value.Replace(@"\r\n\r\n", @"<br>");
                         value = value.Replace(@"\r\n", @"<br>");
                         value = value.Replace(@"\n", @"<br>");
                         if (value[0].Equals('"'))
