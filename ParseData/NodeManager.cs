@@ -126,7 +126,7 @@ namespace ParseData
 
                 found = true;
 
-                if (xNode.Element("comment").Value != null && xNode.Element("comment").Value == "TAPS not in Trima") return found;
+                if (xNode.Element("comment") != null && xNode.Element("comment").Value == "TAPS not in Trima") return found;
 
 
                 var isEnglish = DocumentDescriptor.IsEnglishFromTag(parentTn.Tag);
@@ -142,7 +142,14 @@ namespace ParseData
                 {
                     if (data.Comment != null && data.Comment != "")
                     {
-                        xNode.Element("comment").Value = data.Comment;
+                        if (xNode.Element("comment") == null)
+                        {
+                            xNode.Add(new XElement("comment", data.Comment));
+                        }
+                        else
+                        {
+                            xNode.Element("comment").Value = data.Comment;
+                        }
                         tNode.Nodes[1].Text = data.Comment;
                         tNode.Nodes[1].ForeColor = System.Drawing.Color.Red;
                         tNode.ForeColor = System.Drawing.Color.Red;
