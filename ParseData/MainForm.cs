@@ -366,6 +366,11 @@ namespace ParseData
                 e.Handled = true;
             }
         }
+
+        private void GenJSBtn_Click(object sender, EventArgs e)
+        {
+            NodeManager.SaveFilesToJson(treeView1, treeView2);
+         }
     }
 }
 

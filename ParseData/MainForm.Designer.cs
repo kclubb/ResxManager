@@ -41,6 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.GenJSBtn = new System.Windows.Forms.Button();
             this.CopyAllButton = new System.Windows.Forms.Button();
             this.MissingButton = new System.Windows.Forms.Button();
             this.AddButton = new System.Windows.Forms.Button();
@@ -148,7 +149,7 @@
             // SaveButton
             // 
             this.SaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveButton.Location = new System.Drawing.Point(941, 9);
+            this.SaveButton.Location = new System.Drawing.Point(826, 9);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(75, 31);
             this.SaveButton.TabIndex = 6;
@@ -205,6 +206,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.GenJSBtn);
             this.panel1.Controls.Add(this.CopyAllButton);
             this.panel1.Controls.Add(this.MissingButton);
             this.panel1.Controls.Add(this.AddButton);
@@ -217,6 +219,18 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1028, 47);
             this.panel1.TabIndex = 10;
+            // 
+            // GenJSBtn
+            // 
+            this.GenJSBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.GenJSBtn.Location = new System.Drawing.Point(907, 9);
+            this.GenJSBtn.Name = "GenJSBtn";
+            this.GenJSBtn.Size = new System.Drawing.Size(109, 31);
+            this.GenJSBtn.TabIndex = 28;
+            this.GenJSBtn.Text = "Generate JS";
+            this.missingToolTip.SetToolTip(this.GenJSBtn, "Generate JS files into JS subdirectory. Files must be already saved.");
+            this.GenJSBtn.UseVisualStyleBackColor = true;
+            this.GenJSBtn.Click += new System.EventHandler(this.GenJSBtn_Click);
             // 
             // CopyAllButton
             // 
@@ -564,6 +578,7 @@
         private System.Windows.Forms.Button MissingButton;
         private System.Windows.Forms.Button CopyAllButton;
         private System.Windows.Forms.ToolTip missingToolTip;
+        private System.Windows.Forms.Button GenJSBtn;
     }
 }
 

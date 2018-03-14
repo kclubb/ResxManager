@@ -9,6 +9,9 @@ using System.IO;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+using System.Resources;
+using System.Collections;
+using System.ComponentModel.Design;
 
 namespace ParseData
 {
@@ -163,7 +166,14 @@ namespace ParseData
                 {
                     if (data.TranslateComment != null && data.TranslateComment != "")
                     {
-                        xNode.Element("comment").Value = data.TranslateComment;
+                        if (xNode.Element("comment") == null)
+                        {
+                            xNode.Add(new XElement("comment", data.TranslateComment));
+                        }
+                        else
+                        {
+                            xNode.Element("comment").Value = data.TranslateComment;
+                        }
                         tNode.Nodes[1].Text = data.TranslateComment;
                         tNode.Nodes[1].ForeColor = System.Drawing.Color.Red;
                         tNode.ForeColor = System.Drawing.Color.Red;
@@ -467,6 +477,8 @@ namespace ParseData
                 "en",
                 "es-es",
                 "es",
+                "fi-fi",
+                "fi",
                 "fr-fr",
                 "fr",
                 "it-it",
@@ -507,6 +519,77 @@ namespace ParseData
             {
                 ClearColor(cn);
             }
+        }
+
+        public static void SaveFilesToJson(TreeView tv1, TreeView tv2)
+        {
+            DocumentDescriptor desc = (DocumentDescriptor)tv1.Nodes[0].Tag;
+            XDocument doc = desc.Document;
+            string filename = desc.Filename;
+            string outputDir = Path.Combine(Path.GetDirectoryName(filename),"js");
+            if (! Directory.Exists(outputDir))
+            {
+                Directory.CreateDirectory(outputDir);
+            }
+            ProcessFile(outputDir, filename);
+            foreach (TreeNode node in tv2.Nodes)
+            {
+                desc = (DocumentDescriptor)node.Tag;
+                doc = desc.Document;
+                filename = desc.Filename;
+                ProcessFile(outputDir, filename);
+            }
+
+        }
+
+        private static void ProcessFile(string outputPath, string f)
+        {
+            if (File.Exists(f) && Directory.Exists(outputPath) && Path.GetExtension(f) == ".resx")
+            {
+                StringBuilder sb = new StringBuilder("[\n\n");
+                ResXResourceReader rsxr = new ResXResourceReader(f);
+                rsxr.UseResXDataNodes = true;
+                int count = 0;
+                IDictionaryEnumerator dict = rsxr.GetEnumerator();
+                while (dict.MoveNext())
+                {
+                    ResXDataNode node = (ResXDataNode)dict.Value;
+                    //if resource is an image or file ignore it (FileRef will not be null))
+                    if (node.FileRef == null)
+                    {
+                        count++;
+                        string friendlyName = FormatToJSONFriendly(node.Name);
+                        string friendlyValue = FormatToJSONFriendly(node.GetValue((ITypeResolutionService)null).ToString());
+                        string friendlyDesc = (!String.IsNullOrEmpty(node.Comment) ? FormatToJSONFriendly(node.Comment) : "");
+                        sb.Append("{\n\"key\": \"" + 
+                            friendlyName + "\",\n\"value\": \"" + 
+                            friendlyValue + "\",\n\"description\": \"" + 
+                            friendlyDesc + 
+                            "\"\n}, ");
+                    }
+                }
+                string finalString = sb.ToString();
+                if (count > 0)
+                {
+                    finalString = finalString.Substring(0, finalString.Length - 2);
+                    finalString += "\n\n]";
+                }
+                File.WriteAllText(outputPath + "\\" + Path.GetFileNameWithoutExtension(f) + ".js", finalString, Encoding.UTF8);
+                rsxr.Close();
+            }
+            else
+            {
+                throw new Exception(string.Format("File and/or outputPath invalid. File Exists: {0}. Output Path Exists: {1}. File Extension: {2}. Output Path: {3}. Filename: {4}", File.Exists(f), Directory.Exists(outputPath), Path.GetExtension(f), outputPath, f));
+            }
+        }
+
+        private static string FormatToJSONFriendly(string stringToFormat)
+        {
+            if (!String.IsNullOrEmpty(stringToFormat))
+            {
+                stringToFormat = stringToFormat.Replace("/'/g", "\'");
+            }
+            return stringToFormat;
         }
     }
 }
