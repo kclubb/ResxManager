@@ -465,6 +465,7 @@ namespace ParseData
         {
             string[] langs = new string[]
             {
+                "ar",
                 "cs-cz",
                 "cs",
                 "de-de",
@@ -474,8 +475,8 @@ namespace ParseData
                 "en",
                 "es-es",
                 "es",
-                "fi-fi",
                 "fi",
+                "fi-fi",
                 "fr-fr",
                 "fr",
                 "it-it",
